@@ -1,0 +1,72 @@
+- name: build and deploy the service
+  hosts: all
+  remote_user: ubuntu
+  vars:
+    clone_dir1: /home/ubuntu/user-management-system
+    clone_dir2: /home/ubuntu/learning-management-system
+
+  tasks:
+  - name: pull ums latest changes
+    shell: git pull 
+    args:
+      chdir: "{{clone_dir1}}"
+      executable: /bin/bash
+
+  - name: pull lms latest changes
+    shell: git pull 
+    args:
+      chdir: "{{clone_dir2}}"
+      executable: /bin/bash
+
+  - name: build ums with maven
+    shell: chdir={{clone_dir1}} mvn clean install
+
+  - name: build lms with maven
+    shell: chdir={{clone_dir2}} mvn clean install
+
+  - name: start docker
+    service: name=docker state=started enabled=yes
+
+  - name: build ums docker image
+    docker_image:
+     name: user-management-system
+     build:
+      pull: no
+      path: "{{clone_dir1}}"
+     source: build
+     force_source: yes
+     state: present
+
+  - name: build lms docker image
+    docker_image:
+     name: learning-management-system
+     build:
+      pull: no
+      path: "{{clone_dir2}}"
+     source: build
+     force_source: yes
+     state: present
+
+  - name: build ums docker container
+    docker_container:
+     name: ums
+     image: user-management-system
+     auto_remove: yes
+     ports:
+      - "8090:8090"
+     env:
+      ums_db_username: username
+      ums_db_password: password
+     state: started
+
+  - name: build lms docker container
+    docker_container:
+     name: lms
+     image: learning-management-system
+     auto_remove: yes
+     ports:
+      - "8080:8080"
+     env:
+      lms_db_username: username
+      lms_db_password: password
+     state: started
