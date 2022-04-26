@@ -58,6 +58,7 @@
       ums_db_url: db.team8backend.tech/ums
       ums_db_username: username
       ums_db_password: password
+      token_secret: OurLittleSecretIsHere
      state: started
 
   - name: build lms docker container
@@ -71,4 +72,5 @@
       lms_db_url: db.team8backend.tech/lms
       lms_db_username: username
       lms_db_password: password
+      token_secret: OurLittleSecretIsHere
      state: started
