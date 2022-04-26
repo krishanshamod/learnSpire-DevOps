@@ -55,6 +55,7 @@
      ports:
       - "8090:8090"
      env:
+      ums_db_url: db.team8backend.tech/ums
       ums_db_username: username
       ums_db_password: password
      state: started
@@ -67,6 +68,7 @@
      ports:
       - "8080:8080"
      env:
+      lms_db_url: db.team8backend.tech/lms
       lms_db_username: username
       lms_db_password: password
      state: started
