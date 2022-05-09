@@ -1,0 +1,38 @@
+- name: deploy the services
+  hosts: all
+  remote_user: ubuntu
+
+  tasks:
+  - name: start docker
+    service: name=docker state=started enabled=yes
+
+  - name: build ums docker container
+    docker_container:
+     name: ums
+     image: user-management-system
+     auto_remove: yes
+     ports:
+      - "8090:8090"
+     env:
+      ums_db_url: db.team8backend.tech/ums
+      ums_db_username: username
+      ums_db_password: password
+      token_secret: secret
+     state: started
+
+  - name: build lms docker container
+    docker_container:
+     name: lms
+     image: learning-management-system
+     auto_remove: yes
+     ports:
+      - "8080:8080"
+     env:
+      lms_db_url: db.team8backend.tech/lms
+      lms_db_username: username
+      lms_db_password: password
+      token_secret: secret
+      mailgun_domain: domain
+      mailgun_api_key: apiKey
+      email_sending_domain: domain
+     state: started
